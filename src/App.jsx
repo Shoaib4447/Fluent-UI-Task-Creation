@@ -1,19 +1,11 @@
 // Imports
-import { Search24Regular } from "@fluentui/react-icons";
-import {
-  Button,
-  makeStyles,
-  Input,
-  Select,
-  Dialog,
-  DialogSurface,
-  DialogBody,
-  DialogContent,
-  DialogActions,
-} from "@fluentui/react-components";
+import { makeStyles ,Button} from "@fluentui/react-components";
 import { useState } from "react";
-import succesImage from "./assets/images/success.png";
 
+import TopBar from "./Components/TopBar/TopBar";
+import Modal from "./Components/Modal/Modal";
+import TaskForm from "./Components/TaskForm/TaskForm";
+import SuccessModal from "./Components/Modal/SuccessModal";
 // Styles
 const useStyles = makeStyles({
   // Layout utilities
@@ -131,20 +123,48 @@ const useStyles = makeStyles({
 });
 
 function App() {
-  // Create Task Dialog
-  const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
-
-  // Task Created Dialog
-  const [successOpen, setSuccessOpen] = useState(false);
-
   const styles = useStyles();
+  // Create Task Dialog state
+  const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
+
+  // Handle form submit
+  const handleTaskCreate = (form) => {
+    // handle task creation logic
+    console.log(`Task Created: ${JSON.stringify(form, null, 2)}`);
+    setOpenCreateTaskDialog(false);
+    setOpenSuccessDialog(true);
+  };
 
   return (
     <>
       <section className={styles.appMainSection}>
-        
-
-        {/* Tasks Section: All created task will be shown here */}
+        <TopBar onCreateClick={() => setOpenCreateTaskDialog(true)} />
+        <Modal
+        open={openCreateTaskDialog}
+        onOpenChange={setOpenCreateTaskDialog}
+        title="Create New Task"
+        actions={
+          <>
+            <Button type="button" onClick={() => setOpenCreateTaskDialog(false)} appearance="secondary">
+              Cancel
+            </Button>
+            <Button type="submit" form="task-create-form" appearance="primary">
+              Save
+            </Button>
+          </>
+        }
+      >
+        <TaskForm
+          onSubmit={handleTaskCreate}
+          id="task-create-form"
+          />
+      </Modal>
+      <SuccessModal
+        open={openSuccessDialog}
+        onOpenChange={setOpenSuccessDialog}
+      />
+      {/* Tasks Section: All created task will be shown here */}
       </section>
     </>
   );

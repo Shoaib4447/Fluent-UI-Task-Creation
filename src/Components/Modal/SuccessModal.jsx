@@ -1,37 +1,24 @@
-import React from "react";
+import Modal from "./Modal";
+import { Button } from "@fluentui/react-components";
+import succesImage from "../../assets/images/success.png";
 
-const SuccessModal = () => {
+const SuccessModal = ({ open, onOpenChange }) => {
   return (
-    <div>
-      {/* Success Dialog */}
-      <Dialog
-        open={successOpen}
-        onOpenChange={(_, data) => setSuccessOpen(data.open)}
-      >
-        <DialogSurface>
-          <DialogBody>
-            {/* <DialogTitle></DialogTitle> */}
-            <DialogContent className={styles.successDialogCentered}>
-              <img
-                className={styles.succesImage}
-                src={succesImage}
-                alt='Success Png'
-              />
-              <h3>Task Created Successfully</h3>
-              <p>You have just added your task.</p>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                appearance='primary'
-                onClick={() => setSuccessOpen(false)}
-              >
-                Close
-              </Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
-    </div>
+    <Modal
+      open={open}
+      onOpenChange={onOpenChange}
+      title={null}
+    >
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+        <img
+          style={{ objectFit: "cover", width: "10rem" }}
+          src={succesImage}
+          alt="Success Png"
+        />
+        <h3>Task Created Successfully</h3>
+        <p>You have just added your task.</p>
+      </div>
+    </Modal>
   );
 };
 
