@@ -1,18 +1,18 @@
-// Imports
-import { Search24Regular } from "@fluentui/react-icons";
 import {
+  makeStyles,
+  Label,
   Button,
   makeStyles,
   Input,
   Select,
   Dialog,
+  DialogTrigger,
   DialogSurface,
   DialogBody,
+  DialogTitle,
   DialogContent,
   DialogActions,
 } from "@fluentui/react-components";
-import { useState } from "react";
-import succesImage from "./assets/images/success.png";
 
 // Styles
 const useStyles = makeStyles({
@@ -130,24 +130,37 @@ const useStyles = makeStyles({
   },
 });
 
-function App() {
-  // Create Task Dialog
-  const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
-
-  // Task Created Dialog
-  const [successOpen, setSuccessOpen] = useState(false);
-
-  const styles = useStyles();
-
+const TopBar = () => {
   return (
-    <>
-      <section className={styles.appMainSection}>
-        
-
-        {/* Tasks Section: All created task will be shown here */}
-      </section>
-    </>
+    <div>
+      {/* Filter Form */}
+      <form className={styles.formContainer}>
+        <div className={styles.searchTask}>
+          <Input
+            id='search'
+            placeholder='Search...'
+            contentBefore={<Search24Regular />}
+            className={styles.seachField}
+          />
+        </div>
+        <div className={styles.toDo}>
+          <Select placeholder='Select Status'>
+            <option>To Do</option>
+            <option>In Progress</option>
+            <option>Done</option>
+          </Select>
+        </div>
+        <div className={styles.assingedTo}>
+          <Select placeholder='Assigned to'>
+            <option>Ali</option>
+            <option>Fatima</option>
+            <option>Ahmed</option>
+          </Select>
+        </div>
+        {/* Dialog Create Task */}
+      </form>
+    </div>
   );
-}
+};
 
-export default App;
+export default TopBar;
