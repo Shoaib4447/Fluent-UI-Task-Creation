@@ -8,12 +8,20 @@ const SuccessModal = ({ open, onOpenChange }) => {
       open={open}
       onOpenChange={onOpenChange}
       title={null}
+      modalType='non-modal'
     >
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <img
           style={{ objectFit: "cover", width: "10rem" }}
           src={succesImage}
-          alt="Success Png"
+          alt='Success Png'
         />
         <h3>Task Created Successfully</h3>
         <p>You have just added your task.</p>

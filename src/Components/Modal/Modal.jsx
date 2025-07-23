@@ -7,10 +7,8 @@ import {
   DialogActions,
   makeStyles,
   Button,
-  
 } from "@fluentui/react-components";
 import { DismissRegular } from "@fluentui/react-icons";
-
 
 // Styles
 const useStyles = makeStyles({
@@ -28,12 +26,20 @@ const useStyles = makeStyles({
 const Modal = ({ open, onOpenChange, title, children, actions }) => {
   const styles = useStyles();
   return (
-    <Dialog open={open} onOpenChange={(_, data) => onOpenChange(data.open)}>
+    <Dialog
+      open={open}
+      onOpenChange={(_, data) => {
+        if (!data.open) {
+          onOpenChange(data.open);
+        }
+      }}
+      // modalType='non-modal'
+    >
       <DialogSurface>
         <DialogBody style={{ position: "relative" }}>
           <Button
-            appearance="subtle"
-            aria-label="Close"
+            appearance='subtle'
+            aria-label='Close'
             icon={<DismissRegular />}
             onClick={() => onOpenChange(false)}
             className={styles.closeButton}

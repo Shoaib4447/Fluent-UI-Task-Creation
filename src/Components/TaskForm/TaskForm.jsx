@@ -46,6 +46,7 @@ const useStyles = makeStyles({
 const TaskForm = ({ onSubmit, id }) => {
   const styles = useStyles();
   // Form state
+  const [taskName, setTaskName] = useState("");
   const [dateInitiated, setDateInitiated] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
@@ -53,13 +54,14 @@ const TaskForm = ({ onSubmit, id }) => {
   const [assignStatus, setAssignStatus] = useState("");
   const [actionItems, setActionItems] = useState("");
   const [materials, setMaterials] = useState([
-    { materialName: "", quantity: "", unit: "" }
+    { materialName: "", quantity: "", unit: "" },
   ]);
   const [description, setDescription] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = {
+      taskName,
       dateInitiated,
       dueDate,
       assignedTo,
@@ -74,7 +76,7 @@ const TaskForm = ({ onSubmit, id }) => {
   };
 
   const handleMaterialChange = (index, field, value) => {
-    setMaterials(prev =>
+    setMaterials((prev) =>
       prev.map((material, i) =>
         i === index ? { ...material, [field]: value } : material
       )
@@ -83,13 +85,22 @@ const TaskForm = ({ onSubmit, id }) => {
 
   return (
     <form onSubmit={handleSubmit} id={id}>
-       <Input appearance="underline" className={styles.full} placeholder="Task Name" style={{marginBottom: "12px"}} />
+      <Input
+        required
+        appearance='underline'
+        className={styles.full}
+        placeholder='Task Name'
+        style={{ marginBottom: "12px" }}
+        value={taskName}
+        maxLength={20}
+        onChange={(e) => setTaskName(e.target.value)}
+      />
       {/* Date Row */}
       <div className={styles.row}>
         <div className={`${styles.half} ${styles.field}`}>
           <Label>Date Initiated</Label>
           <Input
-            type="date"
+            type='date'
             value={dateInitiated}
             onChange={(e) => setDateInitiated(e.target.value)}
           />
@@ -97,7 +108,7 @@ const TaskForm = ({ onSubmit, id }) => {
         <div className={`${styles.half} ${styles.field}`}>
           <Label>Due Date</Label>
           <Input
-            type="date"
+            type='date'
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
           />
@@ -111,7 +122,7 @@ const TaskForm = ({ onSubmit, id }) => {
             value={assignedTo}
             onChange={(e) => setAssignedTo(e.target.value)}
           >
-            <option value="">Select</option>
+            <option value=''>Select</option>
             <option>Charlotte Waltson</option>
             <option>Ali</option>
             <option>Fatima</option>
@@ -123,7 +134,7 @@ const TaskForm = ({ onSubmit, id }) => {
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
           >
-            <option value="">Select</option>
+            <option value=''>Select</option>
             <option>High</option>
             <option>Medium</option>
             <option>Low</option>
@@ -132,11 +143,10 @@ const TaskForm = ({ onSubmit, id }) => {
         <div className={`${styles.third} ${styles.field}`}>
           <Label>Assign Status</Label>
           <Select
-
             value={assignStatus}
             onChange={(e) => setAssignStatus(e.target.value)}
           >
-            <option value="">Select</option>
+            <option value=''>Select</option>
             <option>To Do</option>
             <option>In Progress</option>
             <option>Done</option>
@@ -145,7 +155,6 @@ const TaskForm = ({ onSubmit, id }) => {
       </div>
       {/* Action Items */}
       <div className={styles.full}>
-        
         <Label>Action Items</Label>
         <textarea
           value={actionItems}
@@ -154,7 +163,7 @@ const TaskForm = ({ onSubmit, id }) => {
           className={styles.full}
         />
       </div>
-      
+
       {/* Material List */}
       <p>Materials List</p>
       {materials.map((material, index) => (
@@ -162,32 +171,48 @@ const TaskForm = ({ onSubmit, id }) => {
           <div className={`${styles.third} ${styles.field}`}>
             <Label>Material Name</Label>
             <Input
-              type="text"
+              type='text'
               value={material.materialName}
-              onChange={e => handleMaterialChange(index, "materialName", e.target.value)}
+              onChange={(e) =>
+                handleMaterialChange(index, "materialName", e.target.value)
+              }
             />
           </div>
           <div className={`${styles.third} ${styles.field}`}>
             <Label>Quantity</Label>
             <Input
-              type="number"
+              type='number'
               value={material.quantity}
-              onChange={e => handleMaterialChange(index, "quantity", e.target.value)}
+              onChange={(e) =>
+                handleMaterialChange(index, "quantity", e.target.value)
+              }
             />
           </div>
           <div className={`${styles.third} ${styles.field}`}>
             <Label>Unit</Label>
             <Input
-              type="number"
+              type='number'
               value={material.unit}
-              onChange={e => handleMaterialChange(index, "unit", e.target.value)}
+              onChange={(e) =>
+                handleMaterialChange(index, "unit", e.target.value)
+              }
             />
           </div>
         </div>
       ))}
 
       <div style={{ textAlign: "right", marginBottom: 12 }}>
-        <Button appearance="subtle" style={{ color: "blue" }} type="button" onClick={() => setMaterials([...materials, { materialName: "", quantity: "", unit: "" }])}>
+        <Button
+          appearance='subtle'
+          style={{ color: "blue" }}
+          type='button'
+          onClick={() =>
+            setMaterials([
+              ...materials,
+              { materialName: "", quantity: "", unit: "" },
+            ])
+          }
+        >
           Add More Material
         </Button>
       </div>
@@ -198,6 +223,7 @@ const TaskForm = ({ onSubmit, id }) => {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={5}
+          maxLength={50}
           className={styles.full}
         />
       </div>

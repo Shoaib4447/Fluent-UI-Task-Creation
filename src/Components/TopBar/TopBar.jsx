@@ -80,9 +80,6 @@ const useStyles = makeStyles({
       width: "100%",
     },
   },
-  
-
- 
 });
 
 const TopBar = ({ onCreateClick }) => {
@@ -113,7 +110,9 @@ const TopBar = ({ onCreateClick }) => {
             <option>Ahmed</option>
           </Select>
         </div>
-        <Button appearance='primary' onClick={onCreateClick}>Create</Button>
+        <Button appearance='primary' onClick={onCreateClick}>
+          Create
+        </Button>
         {/* Dialog Create Task */}
       </form>
     </div>
