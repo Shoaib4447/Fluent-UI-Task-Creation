@@ -14,17 +14,23 @@ import { BuildingRegular, BranchRegular } from "@fluentui/react-icons";
 import { useState } from "react";
 import cardContractIcon from "../../assets/images/cardContractIcon.png";
 import cardTitleIcon from "../../assets/images/cardTitleIcon.png";
+import { useDispatch } from "react-redux";
+import { setViewTask, openViewTaskModal } from "../../features/ui/uiSlice";
 
 const useStyles = makeStyles({
   card: {
-    width: "324px",
-    height: "245px",
-    overflow: "hidden",
+    minWidth: "324px",
+    minHeight: "245px",
+    // overflow: "hidden",
     display: "flex",
     gap: "2px",
     backgroundColor: "#FAFAFA",
     borderRadius: "6px",
     border: "1px solid #D1D1D1",
+    paddingTop: "9px",
+    paddingLeft: "9px",
+    paddingRight: "13px",
+    paddingBottom: "10px",
   },
   cardContainer: {
     display: "flex",
@@ -86,7 +92,8 @@ const useStyles = makeStyles({
   },
   metaRow: {
     display: "flex",
-    justifyContent: "space-between",
+    gap: "29.5px",
+    // justifyContent: "space-between",
     height: "40px",
   },
   metaCol: {
@@ -132,7 +139,7 @@ const useStyles = makeStyles({
   },
   footer: {
     display: "flex",
-    width: "234px",
+    // width: "234px",
   },
 
   viewButton: {
@@ -142,7 +149,7 @@ const useStyles = makeStyles({
     padding: "5px 12px",
   },
   statusButton: {
-    width: "147px",
+    width: "120px",
     height: "32px",
     fontSize: "14px",
     fontWeight: "600",
@@ -157,8 +164,9 @@ const useStyles = makeStyles({
 
 const TaskCard = ({ task }) => {
   const styles = useStyles();
+  const dispatch = useDispatch();
   const [assignStatus, setAssignStatus] = useState(task.assignStatus);
-
+  console.log("task assignStatus=> ", task);
   return (
     <Card className={styles.card}>
       <div className={styles.cardContainer}>
@@ -216,7 +224,25 @@ const TaskCard = ({ task }) => {
         <div className={styles.cardFooter}>
           {/* Footer */}
           <CardFooter className={styles.footer}>
-            <Button className={styles.viewButton} size='medium'>
+            <Button
+              className={styles.viewButton}
+              size='medium'
+              appearance='primary'
+              onClick={() => {
+                dispatch(setViewTask(task));
+                dispatch(openViewTaskModal());
+              }}
+            >
+              Edit
+            </Button>
+            <Button
+              className={styles.viewButton}
+              size='medium'
+              onClick={() => {
+                dispatch(setViewTask(task));
+                dispatch(openViewTaskModal());
+              }}
+            >
               View
             </Button>
             <Dropdown

@@ -1,5 +1,11 @@
-import { useState } from "react";
-import { Label, Input, Select, Button } from "@fluentui/react-components";
+import { useState, useEffect } from "react";
+import {
+  Label,
+  Input,
+  Select,
+  Textarea,
+  Button,
+} from "@fluentui/react-components";
 import { makeStyles } from "@fluentui/react-components";
 
 const useStyles = makeStyles({
@@ -43,7 +49,13 @@ const useStyles = makeStyles({
   },
 });
 
-const TaskForm = ({ onSubmit, id }) => {
+const TaskForm = ({
+  onSubmit,
+  id,
+  initialData = {},
+  disabled = false,
+  display,
+}) => {
   const styles = useStyles();
   // Form state
   const [taskName, setTaskName] = useState("");
@@ -57,6 +69,30 @@ const TaskForm = ({ onSubmit, id }) => {
     { materialName: "", quantity: "", unit: "" },
   ]);
   const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (initialData) {
+      setTaskName(initialData.taskName || "");
+      setDateInitiated(initialData.dateInitiated || "");
+      setDueDate(initialData.dueDate || "");
+      setAssignedTo(initialData.assignedTo || "");
+      setPriority(initialData.priority || "");
+      setAssignStatus(initialData.assignStatus || "");
+      setActionItems(initialData.actionItems || "");
+      setMaterials(
+        initialData.materials || [{ materialName: "", quantity: "", unit: "" }]
+      );
+      setDescription(initialData.description || "");
+    }
+  }, [
+    initialData.taskName,
+    initialData.dateInitiated,
+    initialData.dueDate,
+    initialData.assignedTo,
+    initialData.actionItems,
+    initialData.materials,
+    initialData.description,
+  ]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -94,6 +130,7 @@ const TaskForm = ({ onSubmit, id }) => {
         value={taskName}
         maxLength={20}
         onChange={(e) => setTaskName(e.target.value)}
+        disabled={disabled}
       />
       {/* Date Row */}
       <div className={styles.row}>
@@ -103,6 +140,7 @@ const TaskForm = ({ onSubmit, id }) => {
             type='date'
             value={dateInitiated}
             onChange={(e) => setDateInitiated(e.target.value)}
+            disabled={disabled}
           />
         </div>
         <div className={`${styles.half} ${styles.field}`}>
@@ -111,6 +149,7 @@ const TaskForm = ({ onSubmit, id }) => {
             type='date'
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
+            disabled={disabled}
           />
         </div>
       </div>
@@ -121,6 +160,7 @@ const TaskForm = ({ onSubmit, id }) => {
           <Select
             value={assignedTo}
             onChange={(e) => setAssignedTo(e.target.value)}
+            disabled={disabled}
           >
             <option value=''>Select</option>
             <option>Charlotte Waltson</option>
@@ -133,6 +173,7 @@ const TaskForm = ({ onSubmit, id }) => {
           <Select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
+            disabled={disabled}
           >
             <option value=''>Select</option>
             <option>High</option>
@@ -145,6 +186,7 @@ const TaskForm = ({ onSubmit, id }) => {
           <Select
             value={assignStatus}
             onChange={(e) => setAssignStatus(e.target.value)}
+            disabled={disabled}
           >
             <option value=''>Select</option>
             <option>To Do</option>
@@ -156,11 +198,12 @@ const TaskForm = ({ onSubmit, id }) => {
       {/* Action Items */}
       <div className={styles.full}>
         <Label>Action Items</Label>
-        <textarea
+        <Textarea
           value={actionItems}
           onChange={(e) => setActionItems(e.target.value)}
           rows={3}
           className={styles.full}
+          disabled={disabled}
         />
       </div>
 
@@ -176,6 +219,7 @@ const TaskForm = ({ onSubmit, id }) => {
               onChange={(e) =>
                 handleMaterialChange(index, "materialName", e.target.value)
               }
+              disabled={disabled}
             />
           </div>
           <div className={`${styles.third} ${styles.field}`}>
@@ -186,6 +230,7 @@ const TaskForm = ({ onSubmit, id }) => {
               onChange={(e) =>
                 handleMaterialChange(index, "quantity", e.target.value)
               }
+              disabled={disabled}
             />
           </div>
           <div className={`${styles.third} ${styles.field}`}>
@@ -196,6 +241,7 @@ const TaskForm = ({ onSubmit, id }) => {
               onChange={(e) =>
                 handleMaterialChange(index, "unit", e.target.value)
               }
+              disabled={disabled}
             />
           </div>
         </div>
@@ -204,7 +250,7 @@ const TaskForm = ({ onSubmit, id }) => {
       <div style={{ textAlign: "right", marginBottom: 12 }}>
         <Button
           appearance='subtle'
-          style={{ color: "blue" }}
+          style={{ color: "blue", display: display }}
           type='button'
           onClick={() =>
             setMaterials([
@@ -212,6 +258,7 @@ const TaskForm = ({ onSubmit, id }) => {
               { materialName: "", quantity: "", unit: "" },
             ])
           }
+          disabled={disabled}
         >
           Add More Material
         </Button>
@@ -219,12 +266,13 @@ const TaskForm = ({ onSubmit, id }) => {
       {/* Description */}
       <div className={styles.full}>
         <Label>Description</Label>
-        <textarea
+        <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={5}
           maxLength={50}
           className={styles.full}
+          disabled={disabled}
         />
       </div>
     </form>

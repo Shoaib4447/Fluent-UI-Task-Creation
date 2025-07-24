@@ -1,9 +1,15 @@
 // Imports
 import { makeStyles, Button } from "@fluentui/react-components";
 // import { useState } from "react";
-import {useSelector ,useDispatch} from 'react-redux';
-import {addTask} from '../features/tasks/taskSlice';
-import {openCreateTaskDialog,closeCreateTaskDialog,openSuccessDialog,closeSuccessDialog} from '../features/ui/uiSlice';
+import { useSelector, useDispatch } from "react-redux";
+import { addTask } from "../features/tasks/taskSlice";
+import {
+  openCreateTaskDialog,
+  closeCreateTaskDialog,
+  openSuccessDialog,
+  closeSuccessDialog,
+  closeViewTaskModal,
+} from "../features/ui/uiSlice";
 
 import TopBar from "../Components/TopBar/TopBar";
 import Modal from "../Components/Modal/Modal";
@@ -25,29 +31,28 @@ const useStyles = makeStyles({
       padding: "0.5rem",
     },
   },
-  
 });
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const styles = useStyles();
-  // Create Task Dialog state
-  // const [openCreateTaskDialog, setOpenCreateTaskDialog] = useState(false);
-  // const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
-  // const [tasks, setTasks] = useState([]);
 
   // Tasks Redux state
-  const tasks = useSelector((state)=>state.tasks.tasks)
+  const tasks = useSelector((state) => state.tasks.tasks);
 
   // Modal Redux State
-  const isCreateTaskDialogOpen = useSelector((state)=>state.ui.openCreateTaskDialog)
-  const isSuccessDialogOpen = useSelector((state)=>state.ui.openSuccessDialog)
-  
-  // const addTask = (task) => {
-  //   setTasks((prev) => [...prev, task]);
-  // };
+  const isCreateTaskDialogOpen = useSelector(
+    (state) => state.ui.openCreateTaskDialog
+  );
+  const isSuccessDialogOpen = useSelector(
+    (state) => state.ui.openSuccessDialog
+  );
 
-
+  // View Task Modal State
+  const isViewTaskModalOpen = useSelector(
+    (state) => state.ui.isViewTaskModalOpen
+  );
+  const viewTask = useSelector((state) => state.ui.viewTask);
 
   // Handle form submit
   const handleTaskCreate = (form) => {
@@ -56,6 +61,7 @@ const Dashboard = () => {
     dispatch(closeCreateTaskDialog());
     dispatch(openSuccessDialog());
   };
+
   return (
     <>
       <section className={styles.appMainSection}>
@@ -64,16 +70,13 @@ const Dashboard = () => {
         {/* Create Task Modal */}
         <Modal
           open={isCreateTaskDialogOpen}
-          onOpenChange={(_,data)=>
-           {
-            if(data.open){
-              dispatch(openCreateTaskDialog()) // open the dialog
+          onOpenChange={(_, data) => {
+            if (data.open) {
+              dispatch(openCreateTaskDialog()); // open the dialog
+            } else {
+              dispatch(closeCreateTaskDialog()); // close the dialog
             }
-            else{
-              dispatch(closeCreateTaskDialog()) // close the dialog
-            }
-           }
-          }
+          }}
           title='Create New Task'
           actions={
             <>
@@ -97,23 +100,28 @@ const Dashboard = () => {
           <TaskForm onSubmit={handleTaskCreate} id='task-create-form' />
         </Modal>
         <SuccessModal
-            open={isSuccessDialogOpen}
-          onOpenChange={()=>dispatch(closeSuccessDialog())}
+          open={isSuccessDialogOpen}
+          onOpenChange={() => dispatch(closeSuccessDialog())}
         />
 
         {/* View Task Modal */}
         <Modal
           open={isViewTaskModalOpen}
-          onOpenChange={()=>dispatch(closeViewTaskModal())}
-          title="View Task"
+          onOpenChange={() => dispatch(closeViewTaskModal())}
+          title='View Task'
           actions={
-            <Button onClick={()=>dispatch(closeViewTaskModal())}>
+            <Button onClick={() => dispatch(closeViewTaskModal())}>
               Close
             </Button>
           }
         >
           {viewTask && (
-            <TaskForm id="view-task-form" initialData={viewTask} disabled={true}/>
+            <TaskForm
+              id='view-task-form'
+              initialData={viewTask}
+              disabled={true}
+              display={"none"}
+            />
           )}
         </Modal>
 
