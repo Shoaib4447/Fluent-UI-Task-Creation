@@ -97,6 +97,7 @@ const TaskForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = {
+      id: initialData?.id || Date.now(),
       taskName,
       dateInitiated,
       dueDate,
@@ -108,7 +109,6 @@ const TaskForm = ({
       description,
     };
     if (onSubmit) onSubmit(form);
-    // Optionally reset form here
   };
 
   const handleMaterialChange = (index, field, value) => {

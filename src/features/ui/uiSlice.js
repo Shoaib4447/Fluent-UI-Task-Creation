@@ -4,7 +4,9 @@ const initialState = {
   openCreateTaskDialog: false,
   openSuccessDialog: false,
   isViewTaskModalOpen: false,
+  isEditTaskModalOpen: false,
   viewTask: null,
+  editTask: null,
 };
 
 const uiSlice = createSlice({
@@ -26,8 +28,6 @@ const uiSlice = createSlice({
 
     // View Modal
     setViewTask: (state, action) => {
-      console.log("action =>", action.payload);
-
       state.viewTask = action.payload;
     },
     clearViewTask: (state) => {
@@ -39,6 +39,21 @@ const uiSlice = createSlice({
     closeViewTaskModal: (state) => {
       state.isViewTaskModalOpen = false;
       state.viewTask = null;
+    },
+
+    // Edit task Modal
+    setEditTask: (state, action) => {
+      state.editTask = action.payload;
+    },
+    clearEditTaskModal: (state) => {
+      state.editTask = null;
+    },
+    openEditTaskModal: (state) => {
+      state.isEditTaskModalOpen = true;
+    },
+    closeEditTaskModal: (state) => {
+      state.isEditTaskModalOpen = false;
+      state.editTask = null;
     },
   },
 });
@@ -52,6 +67,10 @@ export const {
   clearViewTask,
   openViewTaskModal,
   closeViewTaskModal,
+  setEditTask,
+  clearEditTaskModal,
+  openEditTaskModal,
+  closeEditTaskModal,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

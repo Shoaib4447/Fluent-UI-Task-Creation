@@ -14,8 +14,14 @@ import { BuildingRegular, BranchRegular } from "@fluentui/react-icons";
 import { useState } from "react";
 import cardContractIcon from "../../assets/images/cardContractIcon.png";
 import cardTitleIcon from "../../assets/images/cardTitleIcon.png";
-import { useDispatch } from "react-redux";
-import { setViewTask, openViewTaskModal } from "../../features/ui/uiSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { updateTaskStatus } from "../../features/tasks/taskSlice";
+import {
+  setViewTask,
+  setEditTask,
+  openViewTaskModal,
+  openEditTaskModal,
+} from "../../features/ui/uiSlice";
 
 const useStyles = makeStyles({
   card: {
@@ -165,8 +171,10 @@ const useStyles = makeStyles({
 const TaskCard = ({ task }) => {
   const styles = useStyles();
   const dispatch = useDispatch();
-  const [assignStatus, setAssignStatus] = useState(task.assignStatus);
-  console.log("task assignStatus=> ", task);
+  const assignStatus = useSelector((state) => {
+    return state.tasks.tasks.find((t) => t.id === task.id)?.assignStatus;
+  });
+
   return (
     <Card className={styles.card}>
       <div className={styles.cardContainer}>
@@ -229,8 +237,8 @@ const TaskCard = ({ task }) => {
               size='medium'
               appearance='primary'
               onClick={() => {
-                dispatch(setViewTask(task));
-                dispatch(openViewTaskModal());
+                dispatch(setEditTask(task));
+                dispatch(openEditTaskModal());
               }}
             >
               Edit
@@ -250,7 +258,11 @@ const TaskCard = ({ task }) => {
               value={assignStatus}
               size='medium'
               style={{ minWidth: "fit-content" }}
-              onOptionSelect={(_, data) => setAssignStatus(data.optionValue)}
+              onOptionSelect={(_, data) =>
+                dispatch(
+                  updateTaskStatus({ id: task.id, newStatus: data.optionValue })
+                )
+              }
             >
               <Option value='To Do'>To Do</Option>
               <Option value='In Progress'>In Progress</Option>
