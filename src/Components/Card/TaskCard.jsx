@@ -171,6 +171,7 @@ const useStyles = makeStyles({
 const TaskCard = ({ task }) => {
   const styles = useStyles();
   const dispatch = useDispatch();
+
   const assignStatus = useSelector((state) => {
     return state.tasks.tasks.find((t) => t.id === task.id)?.assignStatus;
   });
@@ -237,6 +238,7 @@ const TaskCard = ({ task }) => {
               size='medium'
               appearance='primary'
               onClick={() => {
+                console.log("Editing Task =>", task);
                 dispatch(setEditTask(task));
                 dispatch(openEditTaskModal());
               }}

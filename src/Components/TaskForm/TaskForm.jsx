@@ -66,11 +66,12 @@ const TaskForm = ({
   const [assignStatus, setAssignStatus] = useState("");
   const [actionItems, setActionItems] = useState("");
   const [materials, setMaterials] = useState([
-    { materialName: "", quantity: "", unit: "" },
+    { materialName: "", materialQuantity: "", materialUnit: "" },
   ]);
   const [description, setDescription] = useState("");
 
   useEffect(() => {
+    console.log("initialData in TaskForm =>", initialData); // _id should be present
     if (initialData) {
       setTaskName(initialData.taskName || "");
       setDateInitiated(initialData.dateInitiated || "");
@@ -80,7 +81,9 @@ const TaskForm = ({
       setAssignStatus(initialData.assignStatus || "");
       setActionItems(initialData.actionItems || "");
       setMaterials(
-        initialData.materials || [{ materialName: "", quantity: "", unit: "" }]
+        initialData.materials || [
+          { materialName: "", materialQuantity: "", materialUnit: "" },
+        ]
       );
       setDescription(initialData.description || "");
     }
@@ -97,7 +100,7 @@ const TaskForm = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = {
-      id: initialData?.id || Date.now(),
+      _id: initialData?._id,
       taskName,
       dateInitiated,
       dueDate,
@@ -175,7 +178,6 @@ const TaskForm = ({
             onChange={(e) => setPriority(e.target.value)}
             disabled={disabled}
           >
-            <option value=''>Select</option>
             <option>High</option>
             <option>Medium</option>
             <option>Low</option>
@@ -226,9 +228,13 @@ const TaskForm = ({
             <Label>Quantity</Label>
             <Input
               type='number'
-              value={material.quantity}
+              value={material.materialQuantity}
               onChange={(e) =>
-                handleMaterialChange(index, "quantity", e.target.value)
+                handleMaterialChange(
+                  index,
+                  "materialQuantity",
+                  Number(e.target.value)
+                )
               }
               disabled={disabled}
             />
@@ -237,9 +243,9 @@ const TaskForm = ({
             <Label>Unit</Label>
             <Input
               type='number'
-              value={material.unit}
+              value={material.materialUnit}
               onChange={(e) =>
-                handleMaterialChange(index, "unit", e.target.value)
+                handleMaterialChange(index, "materialUnit", e.target.value)
               }
               disabled={disabled}
             />
@@ -255,7 +261,7 @@ const TaskForm = ({
           onClick={() =>
             setMaterials([
               ...materials,
-              { materialName: "", quantity: "", unit: "" },
+              { materialName: "", materialQuantity: "", materialUnit: "" },
             ])
           }
           disabled={disabled}

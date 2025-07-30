@@ -2,7 +2,11 @@
 import { makeStyles, Button } from "@fluentui/react-components";
 // import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addTask, updateTask } from "../features/tasks/taskSlice";
+import {
+  getAllTasksFromDB,
+  addTask,
+  updateTask,
+} from "../features/tasks/taskSlice";
 import {
   openCreateTaskDialog,
   closeCreateTaskDialog,
@@ -11,13 +15,16 @@ import {
   closeViewTaskModal,
   openEditTaskModal,
   closeEditTaskModal,
+  setEditTask,
 } from "../features/ui/uiSlice";
-
+import TaskService from "../api/taskService.js";
+import { useEffect } from "react";
 import TopBar from "../Components/TopBar/TopBar";
 import Modal from "../Components/Modal/Modal";
 import TaskForm from "../Components/TaskForm/TaskForm";
 import SuccessModal from "../Components/Modal/SuccessModal";
-import TaskCard from "../Components/Card/TaskCard";
+// import CreateTaskModal from "../Components/Modal/CreateTaskModal.jsx";
+import TasksList from "../Components/TasksList/TasksList.jsx";
 import TaskCount from "../Components/TaskCount/TaskCount";
 // Styles
 const useStyles = makeStyles({
@@ -42,6 +49,46 @@ const Dashboard = () => {
   // Tasks Redux state
   const tasks = useSelector((state) => state.tasks.tasks);
 
+  // Handling API using Axios
+  const getAllTasksData = async () => {
+    try {
+      // GET Req
+      const res = await TaskService.getAllTasks();
+      const allTasksFromDB = res.data.tasks;
+      // console.log(allTasksFromDB);
+
+      dispatch(getAllTasksFromDB(allTasksFromDB));
+    } catch (error) {
+      console.log(error);
+      console.log(error.message.status);
+    }
+  };
+
+  const createNewTaskInDB = async (form) => {
+    try {
+      // POST Req
+      const res = await TaskService.createTask(form);
+      return res.data;
+    } catch (error) {
+      console.log(error.message);
+      console.log("error", error);
+    }
+  };
+
+  // PUT Req
+  const updateTaskInDB = async (id, updatedTask) => {
+    try {
+      // PUT Req
+      console.log("Updated Task Object to be saved in DB=>:", updatedTask);
+      const res = await TaskService.updateTask(id, updatedTask);
+      console.log("res.data => ", res.data);
+      return res.data;
+    } catch (error) {
+      console.log(error.message);
+      console.log("error", error);
+    }
+  };
+
   // Modal Redux State
   const isCreateTaskDialogOpen = useSelector(
     (state) => state.ui.openCreateTaskDialog
@@ -50,30 +97,48 @@ const Dashboard = () => {
     (state) => state.ui.openSuccessDialog
   );
 
-  const viewTask = useSelector((state) => state.ui.viewTask);
   // View Task Modal State
+  const viewTask = useSelector((state) => state.ui.viewTask);
   const isViewTaskModalOpen = useSelector(
     (state) => state.ui.isViewTaskModalOpen
   );
-  const editTask = useSelector((state) => state.ui.editTask);
+
   // Edit Task Modal State
+  const editTask = useSelector((state) => state.ui.editTask);
   const isEditTaskModalOpen = useSelector(
     (state) => state.ui.isEditTaskModalOpen
   );
 
   // Handle form submit
-  const handleTaskCreate = (form) => {
-    // handle task creation logic
-    dispatch(addTask(form));
-    dispatch(closeCreateTaskDialog());
-    dispatch(openSuccessDialog());
+  const handleTaskCreate = async (form) => {
+    // now to create task in db and redux store at same time and synced
+    try {
+      console.log("Object to be stored in DB:", form); // object being saved in db
+      const res = await createNewTaskInDB(form);
+      if (!res) return; // prevent dispatch if API failed to create task
+      dispatch(addTask(res.data)); //at first pasing only (form) to store
+      dispatch(closeCreateTaskDialog());
+      dispatch(openSuccessDialog());
+    } catch (error) {
+      console.error("Task creation failed:", error);
+    }
   };
 
   // handle Edit Task
-  const handleEditTask = (updatedTask) => {
+  const handleEditTask = async (updatedTask) => {
+    console.log("Updated Object to be stored in DB:", updatedTask); // object being saved in db
+    console.log("updatedTask._id is =>", updatedTask._id);
+    const res = await updateTaskInDB(updatedTask._id, updatedTask);
+    if (!res) return;
     dispatch(updateTask(updatedTask));
     dispatch(closeEditTaskModal());
   };
+
+  useEffect(() => {
+    getAllTasksData();
+  }, []);
+
+  console.log("Edit task =>", editTask);
 
   return (
     <>
@@ -82,6 +147,7 @@ const Dashboard = () => {
         <TaskCount />
 
         {/* Create Task Modal */}
+        {/* <CreateTaskModal onSubmit={handleTaskCreate} /> */}
         <Modal
           open={isCreateTaskDialogOpen}
           onOpenChange={(_, data) => {
@@ -113,6 +179,7 @@ const Dashboard = () => {
         >
           <TaskForm onSubmit={handleTaskCreate} id='task-create-form' />
         </Modal>
+
         {/* Success Modal Task Created */}
         <SuccessModal
           open={isSuccessDialogOpen}
@@ -123,7 +190,10 @@ const Dashboard = () => {
         <Modal
           title='Edit Task'
           open={isEditTaskModalOpen}
-          onOpenChange={() => dispatch(closeEditTaskModal())}
+          onOpenChange={() => {
+            dispatch(closeEditTaskModal());
+            dispatch(setEditTask({}));
+          }}
           actions={
             <>
               <Button
@@ -170,18 +240,7 @@ const Dashboard = () => {
         </Modal>
 
         {/* Tasks Section: All created task will be shown here */}
-
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "1rem",
-          }}
-        >
-          {tasks.map((task, index) => (
-            <TaskCard key={index} task={task} />
-          ))}
-        </div>
+        <TasksList tasks={tasks} />
       </section>
     </>
   );

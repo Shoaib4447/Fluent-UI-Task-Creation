@@ -1,13 +1,23 @@
+// A function that accepts an initial state, an object of reducer functions, and a "slice name", and automatically generates action creators and action types that correspond to the reducers and state.
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  tasks: [],
+  tasks: [
+    // {id:"",task object},
+    // {id:"",next task}
+  ],
 };
 
 const tasksSlice = createSlice({
+  //A string name for this slice of state. Generated action type constants will use this as a prefix.
   name: "tasks",
+  // The initial state for the reducer
   initialState,
+  // An object of "case reducers". Key names will be used to generate actions.
   reducers: {
+    getAllTasksFromDB: (state, action) => {
+      state.tasks = action.payload;
+    },
     addTask: (state, action) => {
       state.tasks.push(action.payload);
     },
@@ -18,7 +28,9 @@ const tasksSlice = createSlice({
     },
     updateTask: (state, action) => {
       const updatedTask = action.payload;
-      const index = state.tasks.findIndex((task) => task.id === updatedTask.id);
+      const index = state.tasks.findIndex(
+        (task) => task._id === updatedTask._id
+      );
       if (index !== -1) {
         state.tasks[index] = updatedTask;
       }
@@ -26,5 +38,7 @@ const tasksSlice = createSlice({
   },
 });
 
-export const { addTask, updateTaskStatus, updateTask } = tasksSlice.actions;
+// // Action creators are generated for each case reducer function
+export const { getAllTasksFromDB, addTask, updateTaskStatus, updateTask } =
+  tasksSlice.actions;
 export default tasksSlice.reducer;

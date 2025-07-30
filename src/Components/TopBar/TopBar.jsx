@@ -113,7 +113,6 @@ const TopBar = ({ onCreateClick }) => {
         <Button appearance='primary' onClick={onCreateClick}>
           Create
         </Button>
-        {/* Dialog Create Task */}
       </form>
     </div>
   );
