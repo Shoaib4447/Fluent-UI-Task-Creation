@@ -2,28 +2,30 @@
 import { makeStyles, Button } from "@fluentui/react-components";
 // import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { addTask, updateTask } from "../features/tasks/taskSlice";
 import {
-  getAllTasksFromDB,
-  addTask,
-  updateTask,
-} from "../features/tasks/taskSlice";
+  // create moved to topbar
+  getAllTasksData,
+  updateTaskInDB,
+  deleteTaskInDB,
+} from "../api/apiCalls.js";
 import {
   openCreateTaskDialog,
-  closeCreateTaskDialog,
   openSuccessDialog,
   closeSuccessDialog,
   closeViewTaskModal,
   openEditTaskModal,
   closeEditTaskModal,
   setEditTask,
+  openDeleteTaskModal,
+  closeDeleteTaskModal,
 } from "../features/ui/uiSlice";
-import TaskService from "../api/taskService.js";
 import { useEffect } from "react";
 import TopBar from "../Components/TopBar/TopBar";
 import Modal from "../Components/Modal/Modal";
 import TaskForm from "../Components/TaskForm/TaskForm";
 import SuccessModal from "../Components/Modal/SuccessModal";
-// import CreateTaskModal from "../Components/Modal/CreateTaskModal.jsx";
+import DeleteModal from "../Components/Modal/DeleteModal.jsx";
 import TasksList from "../Components/TasksList/TasksList.jsx";
 import TaskCount from "../Components/TaskCount/TaskCount";
 // Styles
@@ -49,50 +51,8 @@ const Dashboard = () => {
   // Tasks Redux state
   const tasks = useSelector((state) => state.tasks.tasks);
 
-  // Handling API using Axios
-  const getAllTasksData = async () => {
-    try {
-      // GET Req
-      const res = await TaskService.getAllTasks();
-      const allTasksFromDB = res.data.tasks;
-      // console.log(allTasksFromDB);
-
-      dispatch(getAllTasksFromDB(allTasksFromDB));
-    } catch (error) {
-      console.log(error);
-      console.log(error.message.status);
-    }
-  };
-
-  const createNewTaskInDB = async (form) => {
-    try {
-      // POST Req
-      const res = await TaskService.createTask(form);
-      return res.data;
-    } catch (error) {
-      console.log(error.message);
-      console.log("error", error);
-    }
-  };
-
-  // PUT Req
-  const updateTaskInDB = async (id, updatedTask) => {
-    try {
-      // PUT Req
-      console.log("Updated Task Object to be saved in DB=>:", updatedTask);
-      const res = await TaskService.updateTask(id, updatedTask);
-      console.log("res.data => ", res.data);
-      return res.data;
-    } catch (error) {
-      console.log(error.message);
-      console.log("error", error);
-    }
-  };
-
   // Modal Redux State
-  const isCreateTaskDialogOpen = useSelector(
-    (state) => state.ui.openCreateTaskDialog
-  );
+
   const isSuccessDialogOpen = useSelector(
     (state) => state.ui.openSuccessDialog
   );
@@ -109,25 +69,13 @@ const Dashboard = () => {
     (state) => state.ui.isEditTaskModalOpen
   );
 
-  // Handle form submit
-  const handleTaskCreate = async (form) => {
-    // now to create task in db and redux store at same time and synced
-    try {
-      console.log("Object to be stored in DB:", form); // object being saved in db
-      const res = await createNewTaskInDB(form);
-      if (!res) return; // prevent dispatch if API failed to create task
-      dispatch(addTask(res.data)); //at first pasing only (form) to store
-      dispatch(closeCreateTaskDialog());
-      dispatch(openSuccessDialog());
-    } catch (error) {
-      console.error("Task creation failed:", error);
-    }
-  };
+  // Delete Task Modal State
+  const isDeleteTaskModalOpen = useSelector(
+    (state) => state.ui.isDeleteTaskModalOpen
+  );
 
   // handle Edit Task
   const handleEditTask = async (updatedTask) => {
-    console.log("Updated Object to be stored in DB:", updatedTask); // object being saved in db
-    console.log("updatedTask._id is =>", updatedTask._id);
     const res = await updateTaskInDB(updatedTask._id, updatedTask);
     if (!res) return;
     dispatch(updateTask(updatedTask));
@@ -135,57 +83,20 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    getAllTasksData();
+    getAllTasksData(dispatch);
   }, []);
-
-  console.log("Edit task =>", editTask);
 
   return (
     <>
       <section className={styles.appMainSection}>
         <TopBar onCreateClick={() => dispatch(openCreateTaskDialog())} />
         <TaskCount />
-
-        {/* Create Task Modal */}
-        {/* <CreateTaskModal onSubmit={handleTaskCreate} /> */}
-        <Modal
-          open={isCreateTaskDialogOpen}
-          onOpenChange={(_, data) => {
-            if (data.open) {
-              dispatch(openCreateTaskDialog()); // open the dialog
-            } else {
-              dispatch(closeCreateTaskDialog()); // close the dialog
-            }
-          }}
-          title='Create New Task'
-          actions={
-            <>
-              <Button
-                type='button'
-                onClick={() => dispatch(closeCreateTaskDialog())}
-                appearance='secondary'
-              >
-                Cancel
-              </Button>
-              <Button
-                type='submit'
-                form='task-create-form'
-                appearance='primary'
-              >
-                Save
-              </Button>
-            </>
-          }
-        >
-          <TaskForm onSubmit={handleTaskCreate} id='task-create-form' />
-        </Modal>
-
+        {/* Create Task Modal moved to Top Bar*/}
         {/* Success Modal Task Created */}
         <SuccessModal
           open={isSuccessDialogOpen}
           onOpenChange={() => dispatch(closeSuccessDialog())}
         />
-
         {/* Edit Modal */}
         <Modal
           title='Edit Task'
@@ -217,7 +128,6 @@ const Dashboard = () => {
             />
           )}
         </Modal>
-
         {/* View Task Modal */}
         <Modal
           open={isViewTaskModalOpen}
@@ -238,7 +148,11 @@ const Dashboard = () => {
             />
           )}
         </Modal>
-
+        {/* DELETE Modal */}
+        <DeleteModal
+          open={isDeleteTaskModalOpen}
+          onOpenChange={() => dispatch(closeDeleteTaskModal())}
+        />
         {/* Tasks Section: All created task will be shown here */}
         <TasksList tasks={tasks} />
       </section>

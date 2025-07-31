@@ -1,5 +1,15 @@
 import { makeStyles, Input, Select, Button } from "@fluentui/react-components";
 import { Search24Regular } from "@fluentui/react-icons";
+import {
+  openCreateTaskDialog,
+  closeCreateTaskDialog,
+  openSuccessDialog,
+} from "../../features/ui/uiSlice";
+import { useSelector, useDispatch } from "react-redux";
+import Modal from "../Modal/Modal";
+import TaskForm from "../TaskForm/TaskForm";
+import { createNewTaskInDB } from "../../api/apiCalls";
+import { addTask } from "../../features/tasks/taskSlice";
 // Styles
 const useStyles = makeStyles({
   // Layout utilities
@@ -84,6 +94,24 @@ const useStyles = makeStyles({
 
 const TopBar = ({ onCreateClick }) => {
   const styles = useStyles();
+  const dispatch = useDispatch();
+  const isCreateTaskDialogOpen = useSelector(
+    (state) => state.ui.openCreateTaskDialog
+  );
+
+  // Handle form submit
+  const handleTaskCreate = async (form) => {
+    // now to create task in db and redux store at same time and synced
+    try {
+      const res = await createNewTaskInDB(form);
+      if (!res) return; // prevent dispatch if API failed to create task
+      dispatch(addTask(res.data)); //at first pasing only (form) to store
+      dispatch(closeCreateTaskDialog());
+      dispatch(openSuccessDialog());
+    } catch (error) {
+      console.error("Task creation failed:", error);
+    }
+  };
   return (
     <div>
       {/* Filter Form */}
@@ -114,6 +142,35 @@ const TopBar = ({ onCreateClick }) => {
           Create
         </Button>
       </form>
+
+      {/* Task Create Modal */}
+      <Modal
+        open={isCreateTaskDialogOpen}
+        onOpenChange={(_, data) => {
+          if (data.open) {
+            dispatch(openCreateTaskDialog()); // open the dialog
+          } else {
+            dispatch(closeCreateTaskDialog()); // close the dialog
+          }
+        }}
+        title='Create New Task'
+        actions={
+          <>
+            <Button
+              type='button'
+              onClick={() => dispatch(closeCreateTaskDialog())}
+              appearance='secondary'
+            >
+              Cancel
+            </Button>
+            <Button type='submit' form='task-create-form' appearance='primary'>
+              Save
+            </Button>
+          </>
+        }
+      >
+        <TaskForm onSubmit={handleTaskCreate} id='task-create-form' />
+      </Modal>
     </div>
   );
 };

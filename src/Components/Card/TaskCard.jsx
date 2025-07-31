@@ -9,8 +9,13 @@ import {
   Avatar,
   Dropdown,
   Option,
+  Tooltip,
 } from "@fluentui/react-components";
-import { BuildingRegular, BranchRegular } from "@fluentui/react-icons";
+import {
+  BuildingRegular,
+  BranchRegular,
+  DismissSquareRegular,
+} from "@fluentui/react-icons";
 import { useState } from "react";
 import cardContractIcon from "../../assets/images/cardContractIcon.png";
 import cardTitleIcon from "../../assets/images/cardTitleIcon.png";
@@ -19,13 +24,16 @@ import { updateTaskStatus } from "../../features/tasks/taskSlice";
 import {
   setViewTask,
   setEditTask,
+  setDeleteTask,
   openViewTaskModal,
   openEditTaskModal,
+  openDeleteTaskModal,
 } from "../../features/ui/uiSlice";
 
 const useStyles = makeStyles({
   card: {
     minWidth: "324px",
+    maxWidth: "390px",
     minHeight: "245px",
     // overflow: "hidden",
     display: "flex",
@@ -79,11 +87,23 @@ const useStyles = makeStyles({
 
   contractTitle: {
     display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     gap: "8px",
   },
   cardTitleIcon: {
     width: "16px",
     height: "21px",
+  },
+
+  DismissSquareRegular: {
+    fontSize: "30px",
+    color: "#c50f1f",
+    cursor: "pointer",
+  },
+  DismissSquareRegularBtn: {
+    width: "30px",
+    height: "30px",
   },
 
   taskTitleDiv: {
@@ -173,7 +193,7 @@ const TaskCard = ({ task }) => {
   const dispatch = useDispatch();
 
   const assignStatus = useSelector((state) => {
-    return state.tasks.tasks.find((t) => t.id === task.id)?.assignStatus;
+    return state.tasks.tasks.find((t) => t._id === task._id)?.assignStatus;
   });
 
   return (
@@ -183,14 +203,25 @@ const TaskCard = ({ task }) => {
           <div className={styles.headerRow}>
             {/* Project/Company Name */}
             <div className={styles.contractTitle}>
-              <span className={styles.preview}>
-                <img
-                  className={styles.cardContractIcon}
-                  src={cardContractIcon}
-                  alt='cardContractIcon'
+              <div>
+                <span className={styles.preview}>
+                  <img
+                    className={styles.cardContractIcon}
+                    src={cardContractIcon}
+                    alt='cardContractIcon'
+                  />
+                  <h3 className={styles.cardContractTitle}>{task.taskName}</h3>
+                </span>
+              </div>
+              <div>
+                <DismissSquareRegular
+                  className={styles.DismissSquareRegular}
+                  onClick={() => {
+                    dispatch(setDeleteTask(task));
+                    dispatch(openDeleteTaskModal());
+                  }}
                 />
-                <h3 className={styles.cardContractTitle}>{task.taskName}</h3>
-              </span>
+              </div>
             </div>
             {/* Task Title and Priority */}
             <div className={styles.taskTitleDiv}>
@@ -238,7 +269,6 @@ const TaskCard = ({ task }) => {
               size='medium'
               appearance='primary'
               onClick={() => {
-                console.log("Editing Task =>", task);
                 dispatch(setEditTask(task));
                 dispatch(openEditTaskModal());
               }}
@@ -255,6 +285,7 @@ const TaskCard = ({ task }) => {
             >
               View
             </Button>
+
             <Dropdown
               className={styles.statusButton}
               value={assignStatus}
@@ -262,7 +293,10 @@ const TaskCard = ({ task }) => {
               style={{ minWidth: "fit-content" }}
               onOptionSelect={(_, data) =>
                 dispatch(
-                  updateTaskStatus({ id: task.id, newStatus: data.optionValue })
+                  updateTaskStatus({
+                    id: task._id,
+                    newStatus: data.optionValue,
+                  })
                 )
               }
             >

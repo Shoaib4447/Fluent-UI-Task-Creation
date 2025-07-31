@@ -5,20 +5,24 @@ const initialState = {
   openSuccessDialog: false,
   isViewTaskModalOpen: false,
   isEditTaskModalOpen: false,
+  isDeleteTaskModalOpen: false,
   viewTask: null,
   editTask: null,
+  deleteTask: null,
 };
 
 const uiSlice = createSlice({
   name: "ui",
   initialState,
   reducers: {
+    // Create Task Dialog
     openCreateTaskDialog: (state) => {
       state.openCreateTaskDialog = true;
     },
     closeCreateTaskDialog: (state) => {
       state.openCreateTaskDialog = false;
     },
+    // Success Task Dialog
     openSuccessDialog: (state) => {
       state.openSuccessDialog = true;
     },
@@ -26,7 +30,7 @@ const uiSlice = createSlice({
       state.openSuccessDialog = false;
     },
 
-    // View Modal
+    // Veiw Task Dialog
     setViewTask: (state, action) => {
       state.viewTask = action.payload;
     },
@@ -41,7 +45,7 @@ const uiSlice = createSlice({
       state.viewTask = null;
     },
 
-    // Edit task Modal
+    // Edit Task Dialog
     setEditTask: (state, action) => {
       state.editTask = action.payload;
     },
@@ -54,6 +58,17 @@ const uiSlice = createSlice({
     closeEditTaskModal: (state) => {
       state.isEditTaskModalOpen = false;
       state.editTask = null;
+    },
+
+    // Delete Task Dialog
+    setDeleteTask: (state, action) => {
+      state.deleteTask = action.payload;
+    },
+    openDeleteTaskModal: (state) => {
+      state.isDeleteTaskModalOpen = true;
+    },
+    closeDeleteTaskModal: (state) => {
+      state.isDeleteTaskModalOpen = false;
     },
   },
 });
@@ -71,6 +86,9 @@ export const {
   clearEditTaskModal,
   openEditTaskModal,
   closeEditTaskModal,
+  setDeleteTask,
+  openDeleteTaskModal,
+  closeDeleteTaskModal,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;

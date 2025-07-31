@@ -23,8 +23,10 @@ const tasksSlice = createSlice({
     },
     updateTaskStatus: (state, action) => {
       const { id, newStatus } = action.payload;
-      const task = state.tasks.find((t) => t.id == id);
-      if (task) task.assignStatus = newStatus;
+      const task = state.tasks.find((task) => task._id === id);
+      if (task) {
+        task.assignStatus = newStatus;
+      }
     },
     updateTask: (state, action) => {
       const updatedTask = action.payload;
@@ -35,10 +37,19 @@ const tasksSlice = createSlice({
         state.tasks[index] = updatedTask;
       }
     },
+    deleteTaskFromRTK: (state, action) => {
+      const id = action.payload;
+      state.tasks = state.tasks.filter((task) => task._id !== id);
+    },
   },
 });
 
 // // Action creators are generated for each case reducer function
-export const { getAllTasksFromDB, addTask, updateTaskStatus, updateTask } =
-  tasksSlice.actions;
+export const {
+  deleteTaskFromRTK,
+  getAllTasksFromDB,
+  addTask,
+  updateTaskStatus,
+  updateTask,
+} = tasksSlice.actions;
 export default tasksSlice.reducer;

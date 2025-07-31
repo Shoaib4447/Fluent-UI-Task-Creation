@@ -1,8 +1,17 @@
 import Modal from "./Modal";
-import { Button } from "@fluentui/react-components";
+import { Button, makeStyles } from "@fluentui/react-components";
 import succesImage from "../../assets/images/success.png";
-
+const useStyles = makeStyles({
+  SucessDiv: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  SuccessImg: { objectFit: "cover", width: "10rem" },
+});
 const SuccessModal = ({ open, onOpenChange }) => {
+  const styles = useStyles();
   return (
     <Modal
       open={open}
@@ -10,16 +19,9 @@ const SuccessModal = ({ open, onOpenChange }) => {
       title={null}
       modalType='non-modal'
     >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div className={styles.SucessDiv}>
         <img
-          style={{ objectFit: "cover", width: "10rem" }}
+          className={styles.SuccessImg}
           src={succesImage}
           alt='Success Png'
         />
