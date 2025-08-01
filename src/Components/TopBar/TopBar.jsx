@@ -9,7 +9,8 @@ import { useSelector, useDispatch } from "react-redux";
 import Modal from "../Modal/Modal";
 import TaskForm from "../TaskForm/TaskForm";
 import { createNewTaskInDB } from "../../api/apiCalls";
-import { addTask } from "../../features/tasks/taskSlice";
+import { addTask, setTaskSubmitting } from "../../features/tasks/taskSlice";
+import { ClipLoader } from "react-spinners";
 // Styles
 const useStyles = makeStyles({
   // Layout utilities
@@ -98,12 +99,14 @@ const TopBar = ({ onCreateClick }) => {
   const isCreateTaskDialogOpen = useSelector(
     (state) => state.ui.openCreateTaskDialog
   );
-
+  // Disable Buttons While req sent
+  const isTaskSubmitting = useSelector((state) => state.tasks.isTaskSubmitting);
+  console.log("isTaskSubmitting=>", isTaskSubmitting);
   // Handle form submit
   const handleTaskCreate = async (form) => {
     // now to create task in db and redux store at same time and synced
     try {
-      const res = await createNewTaskInDB(form);
+      const res = await createNewTaskInDB(form, dispatch);
       if (!res) return; // prevent dispatch if API failed to create task
       dispatch(addTask(res.data)); //at first pasing only (form) to store
       dispatch(closeCreateTaskDialog());
@@ -147,7 +150,7 @@ const TopBar = ({ onCreateClick }) => {
       <Modal
         open={isCreateTaskDialogOpen}
         onOpenChange={(_, data) => {
-          if (data.open) {
+          if (data?.open) {
             dispatch(openCreateTaskDialog()); // open the dialog
           } else {
             dispatch(closeCreateTaskDialog()); // close the dialog
@@ -160,11 +163,21 @@ const TopBar = ({ onCreateClick }) => {
               type='button'
               onClick={() => dispatch(closeCreateTaskDialog())}
               appearance='secondary'
+              disabled={isTaskSubmitting}
             >
               Cancel
             </Button>
-            <Button type='submit' form='task-create-form' appearance='primary'>
-              Save
+            <Button
+              disabled={isTaskSubmitting}
+              type='submit'
+              form='task-create-form'
+              appearance='primary'
+            >
+              {isTaskSubmitting ? (
+                <ClipLoader color='#3B82F6' size={15} />
+              ) : (
+                "Save"
+              )}
             </Button>
           </>
         }

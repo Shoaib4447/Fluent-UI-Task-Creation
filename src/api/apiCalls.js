@@ -1,48 +1,55 @@
-import { getAllTasksFromDB } from "../features/tasks/taskSlice.js";
+import {
+  getAllTasksFromDB,
+  setTasksLoading,
+} from "../features/tasks/taskSlice.js";
 import TaskService from "./taskService.js";
-import moment from "moment";
+import { setTaskSubmitting } from "../features/tasks/taskSlice.js";
 // Handling API using Axios
 // GET
-export const getAllTasksData = async (dispatch) => {
+export const getAllTasksData = async (dispatch, tasksLoaded) => {
   try {
     // GET Req
+    dispatch(setTasksLoading(true));
     const res = await TaskService.getAllTasks();
     const allTasksFromDB = res.data.tasks;
     const formattedTasks = allTasksFromDB.map((task) => ({
       ...task,
-      dueDate: moment(task.dueDate).format("DD MMM YYYY"),
-      dateInitiated: moment(task.dateInitiated).format("DD MMM YYYY"),
     }));
-
-    console.log("Formatted Tasks =>", formattedTasks);
 
     dispatch(getAllTasksFromDB(formattedTasks));
   } catch (error) {
     console.log(error);
     console.log(error.message.status);
+    dispatch(setTasksLoading(false));
   }
 };
 // POST Req
-export const createNewTaskInDB = async (form) => {
+export const createNewTaskInDB = async (form, dispatch) => {
   try {
+    dispatch(setTaskSubmitting(true)); // Buttons Disabled
     const res = await TaskService.createTask(form);
+    dispatch(setTaskSubmitting(false));
     return res.data;
   } catch (error) {
     console.log(error.message);
     console.log("error", error);
+  } finally {
+    dispatch(setTaskSubmitting(false));
   }
 };
 
 // PUT Req (UPDATE)
-export const updateTaskInDB = async (id, updatedTask) => {
+export const updateTaskInDB = async (id, updatedTask, dispatch) => {
   try {
-    console.log("Updated Task Object to be saved in DB=>:", updatedTask);
+    dispatch(setTaskSubmitting(true));
     const res = await TaskService.updateTask(id, updatedTask);
-    console.log("PUT update task res.data => ", res.data);
+    dispatch(setTaskSubmitting(false));
     return res.data;
   } catch (error) {
     console.log(error.message);
     console.log("error", error);
+  } finally {
+    dispatch(setTaskSubmitting(false));
   }
 };
 

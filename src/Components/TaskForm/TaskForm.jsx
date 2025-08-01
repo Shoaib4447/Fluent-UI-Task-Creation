@@ -7,7 +7,8 @@ import {
   Button,
 } from "@fluentui/react-components";
 import { makeStyles } from "@fluentui/react-components";
-
+import moment from "moment";
+import { useSelector } from "react-redux";
 const useStyles = makeStyles({
   row: {
     display: "flex",
@@ -59,8 +60,8 @@ const TaskForm = ({
   const styles = useStyles();
   // Form state
   const [taskName, setTaskName] = useState("");
-  const [dateInitiated, setDateInitiated] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [dateInitiated, setDateInitiated] = useState();
+  const [dueDate, setDueDate] = useState();
   const [assignedTo, setAssignedTo] = useState("");
   const [priority, setPriority] = useState("");
   const [assignStatus, setAssignStatus] = useState("");
@@ -71,7 +72,6 @@ const TaskForm = ({
   const [description, setDescription] = useState("");
 
   useEffect(() => {
-    console.log("initialData in TaskForm =>", initialData); // _id should be present
     if (initialData) {
       setTaskName(initialData.taskName || "");
       setDateInitiated(initialData.dateInitiated || "");
@@ -99,6 +99,7 @@ const TaskForm = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     const form = {
       _id: initialData?._id,
       taskName,
@@ -141,7 +142,7 @@ const TaskForm = ({
           <Label>Date Initiated</Label>
           <Input
             type='date'
-            value={dateInitiated}
+            value={moment(dateInitiated).format("YYYY-MM-DD")}
             onChange={(e) => setDateInitiated(e.target.value)}
             disabled={disabled}
           />
@@ -150,7 +151,7 @@ const TaskForm = ({
           <Label>Due Date</Label>
           <Input
             type='date'
-            value={dueDate}
+            value={moment(dueDate).format("YYYY-MM-DD")}
             onChange={(e) => setDueDate(e.target.value)}
             disabled={disabled}
           />
@@ -252,7 +253,7 @@ const TaskForm = ({
           </div>
         </div>
       ))}
-
+      {/* Add material Button */}
       <div style={{ textAlign: "right", marginBottom: 12 }}>
         <Button
           appearance='subtle'

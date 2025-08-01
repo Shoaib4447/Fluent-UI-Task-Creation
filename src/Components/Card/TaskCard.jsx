@@ -11,6 +11,7 @@ import {
   Option,
   Tooltip,
 } from "@fluentui/react-components";
+import moment from "moment";
 import {
   BuildingRegular,
   BranchRegular,
@@ -98,8 +99,11 @@ const useStyles = makeStyles({
 
   DismissSquareRegular: {
     fontSize: "30px",
-    color: "#c50f1f",
+    color: "#b9b9b9ff",
     cursor: "pointer",
+    ":hover": {
+      color: "#c50f1f",
+    },
   },
   DismissSquareRegularBtn: {
     width: "30px",
@@ -241,11 +245,15 @@ const TaskCard = ({ task }) => {
           <div className={styles.metaRow}>
             <div className={styles.metaCol}>
               <Caption1 className={styles.dateTitle}>Date Initiated</Caption1>
-              <Body1 className={styles.date}>{task.dateInitiated}</Body1>
+              <Body1 className={styles.date}>
+                {moment(task.dateInitiated).format("DD MMM YYYY")}
+              </Body1>
             </div>
             <div className={styles.metaCol}>
               <Caption1 className={styles.dateTitle}>Due Date</Caption1>
-              <Body1 className={styles.date}>{task.dueDate}</Body1>
+              <Body1 className={styles.date}>
+                {moment(task.dueDate).format("DD MMM YYYY")}
+              </Body1>
             </div>
             <div className={styles.metaCol}>
               <Caption1 className={styles.dateTitle}>Assigned to</Caption1>

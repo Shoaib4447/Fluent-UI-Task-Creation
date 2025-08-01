@@ -6,6 +6,8 @@ const initialState = {
     // {id:"",task object},
     // {id:"",next task}
   ],
+  isTasksBeingLoaded: false,
+  isTaskSubmitting: false,
 };
 
 const tasksSlice = createSlice({
@@ -15,8 +17,17 @@ const tasksSlice = createSlice({
   initialState,
   // An object of "case reducers". Key names will be used to generate actions.
   reducers: {
+    setTaskSubmitting: (state, action) => {
+      state.isTaskSubmitting = action.payload;
+    },
+    // Tasks loading from DB (spinner)
+    setTasksLoading: (state, action) => {
+      state.isTasksBeingLoaded = action.payload;
+    },
+
     getAllTasksFromDB: (state, action) => {
       state.tasks = action.payload;
+      state.isTasksBeingLoaded = false;
     },
     addTask: (state, action) => {
       state.tasks.push(action.payload);
@@ -46,6 +57,8 @@ const tasksSlice = createSlice({
 
 // // Action creators are generated for each case reducer function
 export const {
+  setTaskSubmitting,
+  setTasksLoading,
   deleteTaskFromRTK,
   getAllTasksFromDB,
   addTask,

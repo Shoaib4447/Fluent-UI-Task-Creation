@@ -1,23 +1,18 @@
 // Imports
 import { makeStyles, Button } from "@fluentui/react-components";
-// import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { addTask, updateTask } from "../features/tasks/taskSlice";
+import { updateTask, setTaskSubmitting } from "../features/tasks/taskSlice";
 import {
-  // create moved to topbar
+  // createTaskModal moved to topbar
   getAllTasksData,
   updateTaskInDB,
-  deleteTaskInDB,
 } from "../api/apiCalls.js";
 import {
   openCreateTaskDialog,
-  openSuccessDialog,
   closeSuccessDialog,
   closeViewTaskModal,
-  openEditTaskModal,
   closeEditTaskModal,
   setEditTask,
-  openDeleteTaskModal,
   closeDeleteTaskModal,
 } from "../features/ui/uiSlice";
 import { useEffect } from "react";
@@ -28,6 +23,7 @@ import SuccessModal from "../Components/Modal/SuccessModal";
 import DeleteModal from "../Components/Modal/DeleteModal.jsx";
 import TasksList from "../Components/TasksList/TasksList.jsx";
 import TaskCount from "../Components/TaskCount/TaskCount";
+import { ClipLoader } from "react-spinners";
 // Styles
 const useStyles = makeStyles({
   // Custom Classes
@@ -42,6 +38,11 @@ const useStyles = makeStyles({
       padding: "0.5rem",
     },
   },
+  ClipLoaderDiv: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 const Dashboard = () => {
@@ -50,15 +51,20 @@ const Dashboard = () => {
 
   // Tasks Redux state
   const tasks = useSelector((state) => state.tasks.tasks);
-
+  // Disable Buttons While req sent
+  const isTaskSubmitting = useSelector((state) => state.tasks.isTaskSubmitting);
+  console.log("isTaskSubmitting=>", isTaskSubmitting);
   // Modal Redux State
+  const allTasksFromDBloading = useSelector(
+    (state) => state.tasks.isTasksBeingLoaded
+  );
 
   const isSuccessDialogOpen = useSelector(
     (state) => state.ui.openSuccessDialog
   );
-
   // View Task Modal State
   const viewTask = useSelector((state) => state.ui.viewTask);
+
   const isViewTaskModalOpen = useSelector(
     (state) => state.ui.isViewTaskModalOpen
   );
@@ -76,7 +82,7 @@ const Dashboard = () => {
 
   // handle Edit Task
   const handleEditTask = async (updatedTask) => {
-    const res = await updateTaskInDB(updatedTask._id, updatedTask);
+    const res = await updateTaskInDB(updatedTask._id, updatedTask, dispatch);
     if (!res) return;
     dispatch(updateTask(updatedTask));
     dispatch(closeEditTaskModal());
@@ -111,11 +117,21 @@ const Dashboard = () => {
                 type='button'
                 onClick={() => dispatch(closeEditTaskModal())}
                 appearance='secondary'
+                disabled={isTaskSubmitting}
               >
                 Cancel
               </Button>
-              <Button type='submit' form='task-edit-form' appearance='primary'>
-                Save
+              <Button
+                disabled={isTaskSubmitting}
+                type='submit'
+                form='task-edit-form'
+                appearance='primary'
+              >
+                {isTaskSubmitting ? (
+                  <ClipLoader color='#3B82F6' size={15} />
+                ) : (
+                  "Edit"
+                )}
               </Button>
             </>
           }
@@ -154,7 +170,13 @@ const Dashboard = () => {
           onOpenChange={() => dispatch(closeDeleteTaskModal())}
         />
         {/* Tasks Section: All created task will be shown here */}
-        <TasksList tasks={tasks} />
+        {allTasksFromDBloading ? (
+          <div className={styles.ClipLoaderDiv}>
+            <ClipLoader color='#3B82F6' size={40} />
+          </div>
+        ) : (
+          <TasksList tasks={tasks} />
+        )}
       </section>
     </>
   );
