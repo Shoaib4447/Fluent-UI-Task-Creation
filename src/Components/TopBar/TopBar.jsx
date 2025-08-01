@@ -9,7 +9,11 @@ import { useSelector, useDispatch } from "react-redux";
 import Modal from "../Modal/Modal";
 import TaskForm from "../TaskForm/TaskForm";
 import { createNewTaskInDB } from "../../api/apiCalls";
-import { addTask, setTaskSubmitting } from "../../features/tasks/taskSlice";
+import {
+  addTask,
+  setSearchByTitle,
+  setSearchByStatus,
+} from "../../features/tasks/taskSlice";
 import { ClipLoader } from "react-spinners";
 // Styles
 const useStyles = makeStyles({
@@ -99,9 +103,13 @@ const TopBar = ({ onCreateClick }) => {
   const isCreateTaskDialogOpen = useSelector(
     (state) => state.ui.openCreateTaskDialog
   );
+  // Search by Title
+  const searchByTitle = useSelector((state) => state.tasks.searchTitle);
+  // Search by Status
+  const searchByStatus = useSelector((state) => state.tasks.searchByStatus);
+
   // Disable Buttons While req sent
   const isTaskSubmitting = useSelector((state) => state.tasks.isTaskSubmitting);
-  console.log("isTaskSubmitting=>", isTaskSubmitting);
   // Handle form submit
   const handleTaskCreate = async (form) => {
     // now to create task in db and redux store at same time and synced
@@ -122,13 +130,20 @@ const TopBar = ({ onCreateClick }) => {
         <div className={styles.half}>
           <Input
             id='search'
-            placeholder='Search...'
+            placeholder='Search by title...'
             contentBefore={<Search24Regular />}
             className={styles.full}
+            value={searchByTitle}
+            onChange={(e) => dispatch(setSearchByTitle(e.target.value))}
           />
         </div>
         <div className={styles.toDo}>
-          <Select placeholder='Select Status'>
+          <Select
+            placeholder='Select Status'
+            value={searchByStatus}
+            onChange={(e) => dispatch(setSearchByStatus(e.target.value))}
+          >
+            <option value=''>Select Status</option>
             <option>To Do</option>
             <option>In Progress</option>
             <option>Done</option>

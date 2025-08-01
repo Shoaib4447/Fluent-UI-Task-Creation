@@ -1,7 +1,6 @@
 import TaskCard from "../Card/TaskCard";
 import { makeStyles } from "@fluentui/react-components";
 const useStyles = makeStyles({
-  cardSection: { display: "flex", justifyContent: "center" },
   tasksCardContainer: {
     display: "flex",
     justifyContent: "start",

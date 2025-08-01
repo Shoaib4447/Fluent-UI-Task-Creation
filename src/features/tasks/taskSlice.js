@@ -8,6 +8,8 @@ const initialState = {
   ],
   isTasksBeingLoaded: false,
   isTaskSubmitting: false,
+  searchTitle: "",
+  searchByStatus: "",
 };
 
 const tasksSlice = createSlice({
@@ -17,6 +19,15 @@ const tasksSlice = createSlice({
   initialState,
   // An object of "case reducers". Key names will be used to generate actions.
   reducers: {
+    // SearchbyTitle
+    setSearchByTitle: (state, action) => {
+      state.searchTitle = action.payload;
+    },
+    // searchbyStatus
+    setSearchByStatus: (state, action) => {
+      state.searchByStatus = action.payload;
+    },
+    // submiting task loading
     setTaskSubmitting: (state, action) => {
       state.isTaskSubmitting = action.payload;
     },
@@ -57,6 +68,8 @@ const tasksSlice = createSlice({
 
 // // Action creators are generated for each case reducer function
 export const {
+  setSearchByStatus,
+  setSearchByTitle,
   setTaskSubmitting,
   setTasksLoading,
   deleteTaskFromRTK,

@@ -1,7 +1,7 @@
 // Imports
 import { makeStyles, Button } from "@fluentui/react-components";
 import { useSelector, useDispatch } from "react-redux";
-import { updateTask, setTaskSubmitting } from "../features/tasks/taskSlice";
+import { updateTask } from "../features/tasks/taskSlice";
 import {
   // createTaskModal moved to topbar
   getAllTasksData,
@@ -53,7 +53,7 @@ const Dashboard = () => {
   const tasks = useSelector((state) => state.tasks.tasks);
   // Disable Buttons While req sent
   const isTaskSubmitting = useSelector((state) => state.tasks.isTaskSubmitting);
-  console.log("isTaskSubmitting=>", isTaskSubmitting);
+
   // Modal Redux State
   const allTasksFromDBloading = useSelector(
     (state) => state.tasks.isTasksBeingLoaded
@@ -88,6 +88,26 @@ const Dashboard = () => {
     dispatch(closeEditTaskModal());
   };
 
+  // Filter Tasks by title
+  // Search by Title && Status
+  const searchByTitle = useSelector((state) => state.tasks.searchTitle);
+  const searchByStatus = useSelector((state) => state.tasks.searchByStatus);
+
+  const filteredTasks =
+    searchByTitle.trim() !== "" || searchByStatus !== ""
+      ? tasks.filter((task) => {
+          const titleMatch = task.taskName
+            .toLowerCase()
+            .includes(searchByTitle.toLowerCase());
+          const statusMatch = task.assignStatus
+            .toLowerCase()
+            .includes(searchByStatus.toLowerCase());
+          console.log("titleMatch=>", titleMatch);
+
+          return titleMatch && statusMatch;
+        })
+      : tasks;
+
   useEffect(() => {
     getAllTasksData(dispatch);
   }, []);
@@ -96,7 +116,7 @@ const Dashboard = () => {
     <>
       <section className={styles.appMainSection}>
         <TopBar onCreateClick={() => dispatch(openCreateTaskDialog())} />
-        <TaskCount />
+        <TaskCount taskFound={filteredTasks} />
         {/* Create Task Modal moved to Top Bar*/}
         {/* Success Modal Task Created */}
         <SuccessModal
@@ -175,7 +195,13 @@ const Dashboard = () => {
             <ClipLoader color='#3B82F6' size={40} />
           </div>
         ) : (
-          <TasksList tasks={tasks} />
+          <div>
+            {filteredTasks.length > 0 ? (
+              <TasksList tasks={filteredTasks} />
+            ) : (
+              <p>No Tasks Found</p>
+            )}
+          </div>
         )}
       </section>
     </>
