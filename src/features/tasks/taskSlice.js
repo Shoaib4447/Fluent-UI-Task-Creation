@@ -10,6 +10,12 @@ const initialState = {
   isTaskSubmitting: false,
   searchTitle: "",
   searchByStatus: "",
+  filteredTaskFromDB: [],
+  // Pagination
+  currentPage: 1,
+  totalPage: 1,
+  totalTask: 0,
+  limit: 10,
 };
 
 const tasksSlice = createSlice({
@@ -19,6 +25,24 @@ const tasksSlice = createSlice({
   initialState,
   // An object of "case reducers". Key names will be used to generate actions.
   reducers: {
+    // setPaginatedTasks
+    setPaginatedTasks: (state, action) => {
+      const { page, limit, totalPages, totalTasks } = action.payload;
+      state.currentPage = page;
+      state.limit = limit;
+      state.totalPage = totalPages;
+      state.totalTask = totalTasks;
+    },
+    setCurrentPage: (state, action) => {
+      state.currentPage = action.payload;
+    },
+    // Task Filter
+    setFilteredTaskFromDB: (state, action) => {
+      state.filteredTaskFromDB = action.payload;
+    },
+    clearFilteredTasks: (state) => {
+      state.filteredTaskFromDB = [];
+    },
     // SearchbyTitle
     setSearchByTitle: (state, action) => {
       state.searchTitle = action.payload;
@@ -68,6 +92,10 @@ const tasksSlice = createSlice({
 
 // // Action creators are generated for each case reducer function
 export const {
+  setPaginatedTasks,
+  setCurrentPage,
+  setFilteredTaskFromDB,
+  clearFilteredTasks,
   setSearchByStatus,
   setSearchByTitle,
   setTaskSubmitting,

@@ -1,11 +1,17 @@
 // Imports
 import { makeStyles, Button } from "@fluentui/react-components";
 import { useSelector, useDispatch } from "react-redux";
-import { updateTask } from "../features/tasks/taskSlice";
+import { useDebounce } from "../api/deBounceApiReq.js";
+import {
+  updateTask,
+  clearFilteredTasks,
+  setPaginatedTasks,
+} from "../features/tasks/taskSlice";
 import {
   // createTaskModal moved to topbar
   getAllTasksData,
   updateTaskInDB,
+  searchTaskFromDB,
 } from "../api/apiCalls.js";
 import {
   openCreateTaskDialog,
@@ -24,6 +30,7 @@ import DeleteModal from "../Components/Modal/DeleteModal.jsx";
 import TasksList from "../Components/TasksList/TasksList.jsx";
 import TaskCount from "../Components/TaskCount/TaskCount";
 import { ClipLoader } from "react-spinners";
+import Pagination from "../Components/Pagination/Pagination.jsx";
 // Styles
 const useStyles = makeStyles({
   // Custom Classes
@@ -51,6 +58,12 @@ const Dashboard = () => {
 
   // Tasks Redux state
   const tasks = useSelector((state) => state.tasks.tasks);
+  // Filtered Tasks
+  const filteredTasks = useSelector((state) => {
+    return state.tasks.filteredTaskFromDB;
+  });
+  // Pagination
+  const currentPage = useSelector((state) => state.tasks.currentPage);
   // Disable Buttons While req sent
   const isTaskSubmitting = useSelector((state) => state.tasks.isTaskSubmitting);
 
@@ -93,30 +106,27 @@ const Dashboard = () => {
   const searchByTitle = useSelector((state) => state.tasks.searchTitle);
   const searchByStatus = useSelector((state) => state.tasks.searchByStatus);
 
-  const filteredTasks =
-    searchByTitle.trim() !== "" || searchByStatus !== ""
-      ? tasks.filter((task) => {
-          const titleMatch = task.taskName
-            .toLowerCase()
-            .includes(searchByTitle.toLowerCase());
-          const statusMatch = task.assignStatus
-            .toLowerCase()
-            .includes(searchByStatus.toLowerCase());
-          console.log("titleMatch=>", titleMatch);
-
-          return titleMatch && statusMatch;
-        })
-      : tasks;
+  const debouncedTitle = useDebounce(searchByTitle, 500);
+  const debouncedStatus = useDebounce(searchByStatus, 500);
 
   useEffect(() => {
-    getAllTasksData(dispatch);
-  }, []);
+    if (debouncedTitle.trim() !== "" || debouncedStatus !== "") {
+      searchTaskFromDB(debouncedTitle, debouncedStatus, dispatch);
+    } else {
+      dispatch(clearFilteredTasks());
+      getAllTasksData(dispatch);
+    }
+  }, [debouncedTitle, debouncedStatus]);
+
+  useEffect(() => {
+    getAllTasksData(dispatch, currentPage);
+  }, [currentPage]);
 
   return (
     <>
       <section className={styles.appMainSection}>
         <TopBar onCreateClick={() => dispatch(openCreateTaskDialog())} />
-        <TaskCount taskFound={filteredTasks} />
+        <TaskCount taskFound={tasks} />
         {/* Create Task Modal moved to Top Bar*/}
         {/* Success Modal Task Created */}
         <SuccessModal
@@ -196,13 +206,14 @@ const Dashboard = () => {
           </div>
         ) : (
           <div>
-            {filteredTasks.length > 0 ? (
-              <TasksList tasks={filteredTasks} />
-            ) : (
-              <p>No Tasks Found</p>
-            )}
+            <TasksList
+              tasks={filteredTasks.length > 0 ? filteredTasks : tasks}
+            />
           </div>
         )}
+
+        {/* Pagination */}
+        <Pagination />
       </section>
     </>
   );

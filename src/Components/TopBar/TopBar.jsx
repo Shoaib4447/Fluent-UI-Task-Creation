@@ -36,6 +36,9 @@ const useStyles = makeStyles({
       flex: "1 1 100%",
     },
   },
+  searchInput: {
+    minWidth: "60%",
+  },
   third: {
     flex: "1 1 0",
     minWidth: "0",
@@ -127,7 +130,7 @@ const TopBar = ({ onCreateClick }) => {
     <div>
       {/* Filter Form */}
       <form className={styles.formContainer}>
-        <div className={styles.half}>
+        <div className={`${styles.half} ${styles.searchInput}`}>
           <Input
             id='search'
             placeholder='Search by title...'
@@ -137,7 +140,7 @@ const TopBar = ({ onCreateClick }) => {
             onChange={(e) => dispatch(setSearchByTitle(e.target.value))}
           />
         </div>
-        <div className={styles.toDo}>
+        <div className={styles.third}>
           <Select
             placeholder='Select Status'
             value={searchByStatus}
@@ -149,13 +152,7 @@ const TopBar = ({ onCreateClick }) => {
             <option>Done</option>
           </Select>
         </div>
-        <div className={styles.assingedTo}>
-          <Select placeholder='Assigned to'>
-            <option>Ali</option>
-            <option>Fatima</option>
-            <option>Ahmed</option>
-          </Select>
-        </div>
+
         <Button appearance='primary' onClick={onCreateClick}>
           Create
         </Button>
