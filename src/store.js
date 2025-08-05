@@ -1,6 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import taskReducer from "./features/tasks/taskSlice";
 import uiReducer from "./features/ui/uiSlice";
+import usersReducer from "./features/auth/authSlice";
 
 export const store = configureStore({
   // Reducer
@@ -14,5 +15,6 @@ export const store = configureStore({
     // By defining a field inside the reducer parameter, we tell the store to use this slice reducer function to handle all updates to that state.
     tasks: taskReducer,
     ui: uiReducer,
+    users: usersReducer,
   },
 });

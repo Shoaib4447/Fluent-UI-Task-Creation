@@ -3,9 +3,9 @@ import {
   setTasksLoading,
   setFilteredTaskFromDB,
   setPaginatedTasks,
+  setTaskSubmitting,
 } from "../features/tasks/taskSlice.js";
 import TaskService from "./taskService.js";
-import { setTaskSubmitting } from "../features/tasks/taskSlice.js";
 // Handling API using Axios
 // GET
 export const getAllTasksData = async (dispatch, newPage) => {
