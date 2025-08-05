@@ -2,6 +2,8 @@ import { Button, makeStyles } from "@fluentui/react-components";
 import { useSelector, useDispatch } from "react-redux";
 import { getAllTasksData } from "../../api/apiCalls";
 import { setCurrentPage } from "../../features/tasks/taskSlice";
+import { useState } from "react";
+import { ClipLoader } from "react-spinners";
 const useStyles = makeStyles({
   PaginationDiv: {
     display: "flex",
@@ -27,24 +29,34 @@ const useStyles = makeStyles({
 const Pagination = () => {
   const styles = useStyles();
   const dispatch = useDispatch();
+  // Local State to disable pagination button
+  // const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+
+  const isTasksBeingLoaded = useSelector(
+    (state) => state.tasks.isTasksBeingLoaded
+  );
 
   const currentPage = useSelector((state) => state.tasks.currentPage);
   const totalPage = useSelector((state) => state.tasks.totalPage);
 
-  console.log("currentPage", currentPage);
-  console.log("totalPage", totalPage);
   const handlePrev = () => {
     if (currentPage > 1) {
+      //&& !isButtonDisabled
+      // setIsButtonDisabled(true);
       const newPage = currentPage - 1;
       dispatch(setCurrentPage(newPage));
       getAllTasksData(dispatch, newPage);
+      // setTimeout(() => setIsButtonDisabled(false), 1000);
     }
   };
   const handleNext = () => {
     if (currentPage < totalPage) {
+      // && !isButtonDisabled
+      // setIsButtonDisabled(true);
       const newPage = currentPage + 1;
       dispatch(setCurrentPage(newPage));
       getAllTasksData(dispatch, newPage);
+      // setTimeout(() => setIsButtonDisabled(false), 1000);
     }
   };
 
@@ -52,7 +64,7 @@ const Pagination = () => {
     <div className={styles.PaginationDiv}>
       <div className={styles.pageBtn}>
         <Button type='button' onClick={handlePrev} disabled={currentPage === 1}>
-          Previous Page
+          {isTasksBeingLoaded ? <ClipLoader size={15} /> : "Previous"}
         </Button>
         <span>{`Page ${currentPage} of ${totalPage}`}</span>
         <Button
@@ -60,7 +72,7 @@ const Pagination = () => {
           onClick={handleNext}
           disabled={currentPage === totalPage}
         >
-          Next Page
+          {isTasksBeingLoaded ? <ClipLoader size={15} /> : "Next"}
         </Button>
       </div>
     </div>

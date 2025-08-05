@@ -12,6 +12,7 @@ const initialState = {
   searchByStatus: "",
   filteredTaskFromDB: [],
   // Pagination
+
   currentPage: 1,
   totalPage: 1,
   totalTask: 0,
