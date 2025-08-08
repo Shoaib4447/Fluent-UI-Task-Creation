@@ -15,6 +15,7 @@ import {
   setSearchByStatus,
 } from "../../features/tasks/taskSlice";
 import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 // Styles
 const useStyles = makeStyles({
   // Layout utilities
@@ -27,7 +28,7 @@ const useStyles = makeStyles({
     boxSizing: "border-box",
   },
   half: {
-    flex: "1 1 0",
+    // flex: "1 1 0",
     minWidth: "0",
     maxWidth: "50%",
     boxSizing: "border-box",
@@ -37,14 +38,14 @@ const useStyles = makeStyles({
     },
   },
   searchInput: {
-    minWidth: "60%",
+    minWidth: "48%",
   },
   third: {
     flex: "1 1 0",
     minWidth: "0",
     maxWidth: "33.33%",
     boxSizing: "border-box",
-    "@media (max-width: 900px)": {
+    "@media (max-width: 600px)": {
       maxWidth: "100%",
       flex: "1 1 100%",
     },
@@ -98,11 +99,16 @@ const useStyles = makeStyles({
       width: "100%",
     },
   },
+  logoutbtn: {
+    backgroundColor: "#bc2f32",
+    color: "white",
+  },
 });
 
 const TopBar = ({ onCreateClick }) => {
   const styles = useStyles();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isCreateTaskDialogOpen = useSelector(
     (state) => state.ui.openCreateTaskDialog
   );
@@ -126,6 +132,12 @@ const TopBar = ({ onCreateClick }) => {
       console.error("Task creation failed:", error);
     }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <div>
       {/* Filter Form */}
@@ -155,6 +167,9 @@ const TopBar = ({ onCreateClick }) => {
 
         <Button appearance='primary' onClick={onCreateClick}>
           Create
+        </Button>
+        <Button onClick={handleLogout} className={styles.logoutbtn}>
+          Logout
         </Button>
       </form>
 

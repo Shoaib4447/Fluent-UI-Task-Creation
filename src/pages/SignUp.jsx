@@ -1,9 +1,10 @@
 import { Button, Input, makeStyles } from "@fluentui/react-components";
-import bg1 from "../assets/svgImages/bg1.svg";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { signUpUser } from "../api/authApiCalls";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { EyeOffRegular, EyeRegular } from "@fluentui/react-icons";
+import PasswordChecklist from "react-password-checklist";
+
 const useStyles = makeStyles({
   registerSection: {
     display: "flex",
@@ -18,11 +19,13 @@ const useStyles = makeStyles({
     flexDirection: "column",
     justifyContent: "center",
     gap: "1rem",
-    // padding: "2rem",
     backgroundColor: "#ffffffff",
     borderRadius: "6px",
     border: "1px solid #D1D1D1",
+    width: "500px",
     minWidth: "200px",
+    paddingTop: "1rem",
+    paddingBottom: "2rem",
   },
   heading: {
     fontSize: "30px",
@@ -30,49 +33,93 @@ const useStyles = makeStyles({
   form: {
     display: "flex",
     flexDirection: "column",
-    // justifyContent: "center",
     alignItems: "center",
     gap: "1rem",
   },
   formTitle: {
     borderBottom: "1px solid #f3f3f3",
-    paddingTop: "2rem",
     paddingLeft: "2rem",
     paddingRight: "2rem",
   },
   inputNameGroup: {
     display: "flex",
-    gap: "10px",
+    width: "87%",
+    gap: "5px",
+    paddingLeft: "2rem",
+    paddingRight: "2rem",
   },
-  inputGroup: { width: "100%" },
-  full: { width: "100%" },
-  half: { width: "50%" },
-  buttonWrapper: {
+  inputGroup: {
+    display: "flex",
+    justifyContent: "center",
+    width: "87%",
+    paddingLeft: "2rem",
+    paddingRight: "2rem",
+  },
+  input: {
+    backgroundColor: "#F2F2F2",
+    color: "#BEBEBE",
+    border: "none",
+    outline: "none",
+    padding: "10px",
     width: "100%",
+    "::placeholder": { color: "#BEBEBE" },
+  },
+  buttonWrapper: {
+    width: "87%",
+    paddingLeft: "2rem",
+    paddingRight: "2rem",
   },
   SignUp: {
-    width: "100%",
+    width: "30%",
+    paddingTop: "0.5rem",
+    paddingBottom: "0.5rem",
+    paddingLeft: "1rem",
+    paddingRight: "1rem",
+  },
+  navigateLogin: { color: "#ffffff" },
+  Loginbtn: {
+    color: "#ffffff",
+  },
+  passwordErrorWrapper: {
+    display: "flex",
+    alignItems: "start",
+    width: "87%",
+    padding: "0px",
+  },
+  passwordError: {
+    textAlign: "left",
+    color: "red",
+    padding: "0px",
+  },
+
+  checklistWrapper: {
+    width: "87%",
   },
 });
 const SignUp = () => {
   const styles = useStyles();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setlastName] = useState("");
+
+  const [firstname, setfirstname] = useState("");
+  const [lastname, setlastname] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // createdUser from signUp API
-  const user = useSelector((state) => state.users.user);
-  const token = useSelector((state) => state.users.token);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const userData = { firstName, lastName, username, email, password };
-    signUpUser(userData, dispatch);
-    navigate("/dashboard");
+
+    const userData = {
+      firstname,
+      lastname,
+      username,
+      email,
+      password,
+    };
+
+    signUpUser(userData, navigate);
   };
   return (
     <section className={styles.registerSection}>
@@ -84,49 +131,96 @@ const SignUp = () => {
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.inputNameGroup}>
             <Input
-              className={styles.half}
+              className={`${styles.input} ${styles.half}`}
               type='text'
-              placeholder='Enter your firstname...'
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              required
+              placeholder='Firstname...'
+              value={firstname}
+              onChange={(e) => setfirstname(e.target.value)}
             />
             <Input
-              className={styles.half}
+              className={`${styles.input} ${styles.half}`}
               type='text'
-              placeholder='Enter your lastname...'
-              value={lastName}
-              onChange={(e) => setlastName(e.target.value)}
+              required
+              placeholder='Lastname...'
+              value={lastname}
+              onChange={(e) => setlastname(e.target.value)}
             />
           </div>
           <div className={styles.inputGroup}>
             <Input
-              className={styles.full}
+              className={`${styles.input} ${styles.full} `}
               type='text'
-              placeholder='Enter your username...'
+              placeholder='Username...'
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </div>
           <div className={styles.inputGroup}>
             <Input
-              className={styles.full}
+              className={`${styles.full} ${styles.input}`}
               type='email'
               required
-              placeholder='Enter Email'
+              placeholder='Email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className={styles.inputGroup}>
             <Input
-              className={styles.full}
-              type='password'
+              className={`${styles.full} ${styles.input}`}
+              contentAfter={
+                <span
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOffRegular /> : <EyeRegular />}
+                </span>
+              }
+              type={showPassword ? "text" : "password"}
               required
-              placeholder='Enter password'
+              placeholder='Password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          <div className={styles.checklistWrapper}>
+            <PasswordChecklist
+              className={styles.checklist}
+              rules={[
+                "minLength",
+                "specialChar",
+                "number",
+                "capital",
+                "match",
+                "lowercase",
+              ]}
+              minLength={8}
+              value={password}
+              valueAgain={confirmPassword}
+              iconSize={10}
+            />
+          </div>
+
+          <div className={styles.inputGroup}>
+            <Input
+              className={`${styles.full} ${styles.input}`}
+              contentAfter={
+                <span
+                  style={{ fontSize: "20px", cursor: "pointer" }}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOffRegular /> : <EyeRegular />}
+                </span>
+              }
+              type={showPassword ? "text" : "password"}
+              required
+              placeholder='Confirm Password'
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
+
           <div className={styles.buttonWrapper}>
             <Button
               type='submit'
@@ -138,8 +232,11 @@ const SignUp = () => {
           </div>
         </form>
       </div>
-      <p>
-        Already have an account? <a href='#'>Login here</a>
+      <p className={styles.navigateLogin}>
+        Already have an account?{" "}
+        <Link to='/Login' className={styles.Loginbtn}>
+          Login here
+        </Link>
       </p>
     </section>
   );

@@ -1,12 +1,25 @@
 import authService from "./authService";
-import { setUser } from "../features/auth/authSlice";
-export const signUpUser = async (userData, dispatch) => {
+import { toast } from "react-toastify";
+// register
+export const signUpUser = async (userData) => {
   try {
-    const res = await authService.signUpUser(userData);
-    const username = res.data.user.name;
-    const token = res.data.token;
-    dispatch(setUser({ username, token }));
+    const res = await authService.signUp(userData, navigate);
+    toast.success("Successfull SignUp");
+    navigate("/login");
   } catch (error) {
-    console.log("error on signUpUser=>", error);
+    toast.error(error);
+  }
+};
+
+// login
+export const loginUser = async (credentials, navigate) => {
+  try {
+    const res = await authService.logIn(credentials);
+    toast.success(res.data.message);
+    localStorage.setItem("token", res.data.token);
+    navigate("/");
+  } catch (error) {
+    toast.error(error.response.data.message);
+    console.log("error loginapi=>", error);
   }
 };
